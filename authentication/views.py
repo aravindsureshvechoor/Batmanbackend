@@ -20,6 +20,7 @@ class Signup(APIView):
         data            = request.data
         print(data,'#########################')
         user_serializer = UserSignupSerializer(data = data)
+        print(user_serializer,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",user_serializer.is_valid())
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         user            = user_serializer.create(user_serializer.validated_data)

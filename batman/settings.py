@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication',
     'corsheaders',
+    'celery',
 
 ]
 
@@ -189,3 +190,12 @@ CORS_ALLOW_HEADERS = [
     'Content-Type',
     'Authorization',
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'aravindsuresh601@gmail.com'
+EMAIL_HOST_PASSWORD = 'cymmphutdwgtyjby'
+
+

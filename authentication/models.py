@@ -6,11 +6,11 @@ from .managers import UserAccountManager
 def upload_to(instance, filename):
     return 'profile/{filename}'.format(filename=filename)
 
-GENDER_CHOICES = [
-    ('M', ('Male')),
-    ('F', ('Female')),
-    ('O', ('Other')),
-]
+# GENDER_CHOICES = [
+#     ('M', ('Male')),
+#     ('F', ('Female')),
+#     ('O', ('Other')),
+# ]
 
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50)
@@ -19,7 +19,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     profile_image = models.ImageField(blank=True, null=True, upload_to=upload_to, default='user.png')
-    age = models.IntegerField(validators=[MinValueValidator(18), MaxValueValidator(99)])
+    # age = models.IntegerField(validators=[MinValueValidator(18), MaxValueValidator(99)])
+    gender = models.CharField(max_length=50)
     is_online = models.BooleanField(default=False)
     set_interest = models.BooleanField(default=False)
     
