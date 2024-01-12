@@ -9,6 +9,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken
 import jwt
+from .tasks import (welcomemail)
+
 
 # Create your views here
 
@@ -18,9 +20,7 @@ User = get_user_model()
 class Signup(APIView):
     def post(self,request):
         data            = request.data
-        print(data,'#########################')
         user_serializer = UserSignupSerializer(data = data)
-        print(user_serializer,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",user_serializer.is_valid())
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         user            = user_serializer.create(user_serializer.validated_data)
@@ -28,6 +28,9 @@ class Signup(APIView):
         user.save()
         serializer      = UserSerializer(user)
         user            = serializer.data
+
+        # Call the Celery task after successful user registration
+        welcomemail.delay(user['email'])
 
         return Response(user, status=status.HTTP_201_CREATED)
 
