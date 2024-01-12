@@ -17,21 +17,19 @@ User = get_user_model()
 class UserSignupSerializer(serializers.ModelSerializer):
     class Meta:
         model  = User
-        fields = ['email', 'first_name', 'last_name', 'age', 'password']
+        fields = ['email', 'first_name', 'last_name','password','age']
 
-    def validate(self,data):
-        user     = User(**data)
+    def validate(self, data):
+        user = User(**data)
         password = data.get('password')
 
         try:
             validate_password(password, user)
         except DRFValidationError as e:
-            serializer_errors = serializers.as_serializer_error(e)
-            raise DRFValidationError(
-                {'password': serializer_errors['non_field_errors']}
-            )
+            raise serializers.ValidationError({'password': str(e)})
 
         return data
+
     
     def create(self, validated_data):
         user = User.objects.create_user(

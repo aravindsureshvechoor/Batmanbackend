@@ -18,6 +18,7 @@ User = get_user_model()
 class Signup(APIView):
     def post(self,request):
         data            = request.data
+        print(data,'#########################')
         user_serializer = UserSignupSerializer(data = data)
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
