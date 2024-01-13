@@ -1,9 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework import status,permissions
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model,authenticate
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.views import View
+from django.utils.decorators import method_decorator
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from .serializers import(UserSignupSerializer,UserSerializer,MyTokenObtainPairSerializer)
+from django.http import JsonResponse
+from .serializers import(UserSignupSerializer,UserSerializer)
 from rest_framework.views import exception_handler
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -34,13 +41,51 @@ class Signup(APIView):
 
         return Response(user, status=status.HTTP_201_CREATED)
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
-    permission_classes = [permissions.AllowAny]
 
-    def post(self, request, *args, **kwargs):
-        try:
-            response = super().post(request, *args, **kwargs)  # Call the parent class's post method
-        except InvalidToken as e:
-            response = Response({'detail': str(e)}, status=e.status_code)
-        return response
+#this is nothing but a function to generate tokens
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserLogin(APIView):
+    def post(self, request, format=None):
+        data = request.data
+        response = Response()
+        email = data.get('email', None)
+        password = data.get('password', None)
+        user = authenticate(email=email, password=password)
+
+        if user is not None:
+            if user.is_active:
+                data = get_tokens_for_user(user)
+                response = JsonResponse({
+                    "data": data,
+                    "user": {
+                        "id": user.id,
+                        "username": user.email,
+                        "name": user.first_name,
+                    }
+                })
+                response.set_cookie(
+                    key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                    value = data["access"],
+                    expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                    secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                    httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                    samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                )
+
+                response.data = {"Success" : "Login successfully","data":data}
+                return response
+            else:
+                return Response({"No active" : "This account is not active!!"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"Invalid" : "Invalid username or password!!"}, status=status.HTTP_404_NOT_FOUND)
+
+

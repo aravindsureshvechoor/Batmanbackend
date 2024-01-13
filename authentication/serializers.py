@@ -61,16 +61,3 @@ class UserSerializer(serializers.ModelSerializer):
 
         return value
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        if user.is_active:
-            token = super().get_token(user)
-            # Add custom claims
-            return token
-        else:
-            if user.is_online:
-                # User is not online, customize the response or raise an exception
-                raise InvalidToken("Your account has been blocked.")
-            else:
-                raise InvalidToken("Please verify your email id.")
