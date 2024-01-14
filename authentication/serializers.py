@@ -61,3 +61,18 @@ class UserSerializer(serializers.ModelSerializer):
 
         return value
 
+class GoogleUserSerializer(serializers.ModelSerializer):
+    
+
+    class Meta:
+        model = User
+        fields = ['id','email']
+
+    
+    
+    def create(self, validated_data):
+        email = validated_data.pop('email')
+        user = User.objects.create(**validated_data)
+        user.email = email
+        user.save()
+        return user

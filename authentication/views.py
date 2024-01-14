@@ -7,7 +7,6 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.http import JsonResponse
 from .serializers import(UserSignupSerializer,UserSerializer)
@@ -68,7 +67,7 @@ class UserLogin(APIView):
                     "data": data,
                     "user": {
                         "id": user.id,
-                        "username": user.email,
+                        "email": user.email,
                         "name": user.first_name,
                     }
                 })
@@ -88,4 +87,61 @@ class UserLogin(APIView):
         else:
             return Response({"Invalid" : "Invalid username or password!!"}, status=status.HTTP_404_NOT_FOUND)
 
+@method_decorator(csrf_exempt, name='dispatch')
+class GoogleAuth(APIView):
+    def post(self, request):
+        data = request.data
+        print('*****', data)
+        email = data.get('email', None)
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            if user is not None:
+                if user.is_active:
+                    data = get_tokens_for_user(user)
+                    response = JsonResponse({
+                        "data": data,
+                        "user": {
+                            "id": user.id,
+                            "email": user.email,
+                            "name": user.first_name,
+                        }
+                    })
+                    response.set_cookie(
+                        key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                        value = data["access"],
+                        expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                        secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                        httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                        samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                    )
+                
+                    response.data = {"Success" : "Login successfully","data":data}
+                    return response
+        else:
+            serializer = GoogleUserSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+            if User.objects.filter(email=email).exists():
+                user = User.objects.get(email=email)
+                if user is not None:
+                    if user.is_active:
+                        data = get_tokens_for_user(user)
+                        response = JsonResponse({
+                            "data": data,
+                            "user": {
+                                "id": user.id,
+                                "email": user.email,
+                                "name": user.first_name,
+                            }
+                        })
+                        response.set_cookie(
+                            key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                            value = data["access"],
+                            expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                            secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                            httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                            samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                        )
 
+                        response.data = {"Success" : "Login successfully","data":data}
+                        return response
