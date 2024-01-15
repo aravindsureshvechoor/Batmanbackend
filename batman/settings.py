@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'authentication',
     'corsheaders',
     'adminbatman',
+    'posts',
     'rest_framework_simplejwt',
 
 ]
@@ -208,7 +209,11 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 
 

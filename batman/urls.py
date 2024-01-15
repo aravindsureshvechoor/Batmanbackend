@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/authentication/',include('authentication.urls')),
     path('api/',include('adminbatman.urls')),
+    path('api/posts/',include('posts.urls')),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 if settings.DEBUG:
