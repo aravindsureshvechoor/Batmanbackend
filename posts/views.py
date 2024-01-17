@@ -19,14 +19,12 @@ class CreatePostView(APIView):
     def post(self, request, *args, **kwargs):
         try:
             user = request.user
-            print("++++++++++++++  ",request.data)
+            
             post_img = request.data['post_img']
             caption = request.data['caption']
-            print("++++++++++++++  ",request.data)
-            print("GGGGGGGGGGGGGGGGGGGGGGGG",post_img)
-            print("mmmmmmmmmmmmmmmmmmmmm",caption)
+            
             serializer = self.serializer_class(data=request.data)
-            print(serializer.is_valid(),"****************************")
+            
             if serializer.is_valid():
                 post = serializer.save(author=user, post_img=post_img, caption=caption)
                 
@@ -37,5 +35,7 @@ class CreatePostView(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)            
         except Exception as e:
+            
 
             return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
