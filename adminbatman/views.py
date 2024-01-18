@@ -19,9 +19,15 @@ class AdminLogin(APIView):
 
         if user is not None and user.is_staff:
             refresh = RefreshToken.for_user(user)
+
             tokens = {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+                "user": {
+                        "id": user.id,
+                        "email": user.email,
+                        "name": user.first_name,
+                    }
             }
             return Response(tokens, status=status.HTTP_200_OK)
         else:
