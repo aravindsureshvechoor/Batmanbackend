@@ -72,7 +72,9 @@ class GoogleUserSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         email = validated_data.pop('email')
+        # first_name = validated_data.pop('name')
         user = User.objects.create(**validated_data)
         user.email = email
+        # user.first_name = first_name
         user.save()
         return user
