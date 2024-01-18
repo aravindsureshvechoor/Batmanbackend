@@ -3,13 +3,15 @@ from rest_framework import status,permissions
 from django.contrib.auth import get_user_model,authenticate
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from datetime import timedelta 
+from django.utils import timezone
 from django.views import View
 from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.http import JsonResponse
-from .serializers import(UserSignupSerializer,UserSerializer)
+from .serializers import(UserSignupSerializer,UserSerializer,GoogleUserSerializer)
 from rest_framework.views import exception_handler
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -144,4 +146,17 @@ class GoogleAuth(APIView):
                         )
 
                         response.data = {"Success" : "Login successfully","data":data}
-                        return response
+                        return response 
+
+class UserLogoutView(APIView):
+    def get(self, request):
+        response = JsonResponse({"message": "Logged out successfully"})
+
+        # Clear the authentication cookie
+        response.delete_cookie(
+            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+            path='/',
+            domain=settings.SIMPLE_JWT.get('AUTH_COOKIE_DOMAIN', None)  # Set to None if not present
+        )
+
+        return response
