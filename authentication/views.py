@@ -148,15 +148,4 @@ class GoogleAuth(APIView):
                         response.data = {"Success" : "Login successfully","data":data}
                         return response 
 
-class UserLogoutView(APIView):
-    def get(self, request):
-        response = JsonResponse({"message": "Logged out successfully"})
 
-        # Clear the authentication cookie
-        response.delete_cookie(
-            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
-            path='/',
-            domain=settings.SIMPLE_JWT.get('AUTH_COOKIE_DOMAIN', None)  # Set to None if not present
-        )
-
-        return response
