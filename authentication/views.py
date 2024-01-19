@@ -17,7 +17,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken
 import jwt
-from .tasks import (welcomemail)
+from .tasks import (welcomemail,otp)
 
 
 # Create your views here
@@ -31,16 +31,63 @@ class Signup(APIView):
         user_serializer = UserSignupSerializer(data = data)
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+        
+
         user            = user_serializer.create(user_serializer.validated_data)
-        user.is_active  = True
+        user.is_active  = False
         user.save()
         serializer      = UserSerializer(user)
         user            = serializer.data
 
-        # Call the Celery task after successful user registration
-        welcomemail.delay(user['email'])
+        #calling the celery task to send otp to the user
+        otp_result=otp.delay(user['email'])
 
-        return Response(user, status=status.HTTP_201_CREATED)
+         # Storing the generated OTP in the session
+        request.session['storedotp'] = otp_result.get()  # Get the result of the Celery task (the OTP)
+        request.session.modified = True
+        request.session.set_expiry(300)
+
+        # Store user's ID in the session for later retrieval during OTP verification
+        request.session['user_id'] = user['id']
+        print('***************************',request.session['user_id'])
+
+        return Response({"detail": "OTP sent successfully"}, status=status.HTTP_200_OK)
+
+
+
+class VerifyOTP(APIView):
+    def post(self, request):
+        
+        print(request.data,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        entered_otp = request.data.get('otp', '')
+        
+        user_id = request.session.get('user_id')
+
+        if not user_id:
+            return Response({"detail": "User ID not found in session"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(pk=user_id)  # Replace YourUserModel with your actual User model
+
+        stored_otp = request.session.get('storedotp', '')
+
+        if entered_otp == stored_otp:
+            user.is_active = True
+            user.save()
+
+            serializer = UserSerializer(user)
+            user_data = serializer.data
+
+            # Call the Celery task after successful user registration
+            welcomemail.delay(user_data['email'])
+
+            # Clear the session data
+            del request.session['user_id']
+            del request.session['storedotp']
+
+            return Response({"detail": "User registered successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 #this is nothing but a function to generate tokens

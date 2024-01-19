@@ -19,16 +19,16 @@ class UserSignupSerializer(serializers.ModelSerializer):
         model  = User
         fields = ['email', 'first_name', 'last_name','password','gender']
 
-    def validate(self, data):
-        user = User(**data)
-        password = data.get('password')
+    # def validate(self, data):
+    #     user = User(**data)
+    #     password = data.get('password')
 
-        try:
-            validate_password(password, user)
-        except DRFValidationError as e:
-            raise serializers.ValidationError({'password': str(e)})
+    #     try:
+    #         validate_password(password, user)
+    #     except DRFValidationError as e:
+    #         raise serializers.ValidationError({'password': str(e)})
 
-        return data
+    #     return data
 
     
     def create(self, validated_data):
