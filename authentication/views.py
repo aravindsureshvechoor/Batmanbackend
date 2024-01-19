@@ -28,6 +28,7 @@ User = get_user_model()
 class Signup(APIView):
     def post(self,request):
         data            = request.data
+        print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&',request.data)
         user_serializer = UserSignupSerializer(data = data)
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
@@ -48,11 +49,9 @@ class Signup(APIView):
         request.session.modified = True
         request.session.set_expiry(300)
 
-        # Store user's ID in the session for later retrieval during OTP verification
-        request.session['user_id'] = user['id']
-        print('***************************',request.session['user_id'])
+        email = request.data.get('email', None)
 
-        return Response({"detail": "OTP sent successfully"}, status=status.HTTP_200_OK)
+        return Response({"detail": "OTP sent successfully","email":email}, status=status.HTTP_200_OK)
 
 
 
@@ -62,12 +61,12 @@ class VerifyOTP(APIView):
         print(request.data,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
         entered_otp = request.data.get('otp', '')
         
-        user_id = request.session.get('user_id')
+        user_mail = request.data.get('email')
 
-        if not user_id:
-            return Response({"detail": "User ID not found in session"}, status=status.HTTP_400_BAD_REQUEST)
+        if not user_mail:
+            return Response({"detail": "User mail not found in request"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(pk=user_id)  # Replace YourUserModel with your actual User model
+        user = User.objects.get(email=user_mail)  # Replace YourUserModel with your actual User model
 
         stored_otp = request.session.get('storedotp', '')
 
@@ -82,8 +81,8 @@ class VerifyOTP(APIView):
             welcomemail.delay(user_data['email'])
 
             # Clear the session data
-            del request.session['user_id']
-            del request.session['storedotp']
+            # del request.session['user_id']
+            # del request.session['storedotp']
 
             return Response({"detail": "User registered successfully"}, status=status.HTTP_200_OK)
         else:
