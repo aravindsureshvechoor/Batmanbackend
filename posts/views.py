@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework import permissions, status, generics
+from rest_framework import permissions, status, generics,viewsets
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.db.models import Q, Count
 from django.db import transaction
-from .serializers import (PostSerializer)
+from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer)
 from .models import Post
 from authentication.models import User
 
@@ -39,3 +39,33 @@ class CreatePostView(APIView):
 
             return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
+class ListPostOnUserSide(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self,request):
+        queryset = Post.objects.all()
+        serializer = PostRetrieveSerializer(queryset, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class UserPostDeleteView(APIView):
+    def delete(self, request, pk, format=None):
+        try:
+            instance = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
+
+class UserPostUpdateView(APIView):
+    def put(self, request, pk, format=None):
+        try:
+            instance = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PostUpdateSerializer(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
