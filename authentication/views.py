@@ -108,6 +108,10 @@ class UserLogin(APIView):
         password = data.get('password', None)
         user = authenticate(email=email, password=password)
 
+        if user.is_blocked == True:
+            return Response({"Blocked" : "This account is blocked!!"}, status=status.HTTP_404_NOT_FOUND)
+
+
         if user is not None:
             if user.is_active:
                 data = get_tokens_for_user(user)
@@ -141,8 +145,15 @@ class GoogleAuth(APIView):
         data = request.data
         print('*****', data)
         email = data.get('email', None)
+
+        
+
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
+
+            if user.is_blocked == True:
+                return Response({"Blocked" : "This account is blocked!!"}, status=status.HTTP_404_NOT_FOUND)
+
             if user is not None:
                 if user.is_active:
                     data = get_tokens_for_user(user)

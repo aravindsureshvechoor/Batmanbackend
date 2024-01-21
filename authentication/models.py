@@ -23,7 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(max_length=50)
     is_online = models.BooleanField(default=False)
     set_interest = models.BooleanField(default=False)
-    
+    is_blocked = models.BooleanField(default=False)
     
     groups = models.ManyToManyField(
         "auth.Group",
