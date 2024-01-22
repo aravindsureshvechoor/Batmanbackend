@@ -18,18 +18,6 @@ class UserSignupSerializer(serializers.ModelSerializer):
     class Meta:
         model  = User
         fields = ['email', 'first_name', 'last_name','password','gender']
-
-    # def validate(self, data):
-    #     user = User(**data)
-    #     password = data.get('password')
-
-    #     try:
-    #         validate_password(password, user)
-    #     except DRFValidationError as e:
-    #         raise serializers.ValidationError({'password': str(e)})
-
-    #     return data
-
     
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -78,3 +66,8 @@ class GoogleUserSerializer(serializers.ModelSerializer):
         # user.first_name = first_name
         user.save()
         return user
+
+class UserRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','email','first_name','last_name']

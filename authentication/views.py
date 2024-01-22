@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.http import JsonResponse
-from .serializers import(UserSignupSerializer,UserSerializer,GoogleUserSerializer)
+from .serializers import(UserSignupSerializer,UserSerializer,GoogleUserSerializer,UserRetrieveSerializer)
 from rest_framework.views import exception_handler
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -206,3 +206,8 @@ class GoogleAuth(APIView):
                         return response 
 
 
+class Retrieveuserdetails(APIView):
+    def get(self,request):
+        user = User.objects.all()
+        serializer = UserRetrieveSerializer(user,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
