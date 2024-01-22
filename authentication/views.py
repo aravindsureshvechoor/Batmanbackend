@@ -208,6 +208,6 @@ class GoogleAuth(APIView):
 
 class Retrieveuserdetails(APIView):
     def get(self,request):
-        user = User.objects.all()
+        user = User.objects.exclude(is_staff=True)
         serializer = UserRetrieveSerializer(user,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
