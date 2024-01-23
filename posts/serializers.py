@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from .models import Post
+from .models import Post,Comment
 from authentication.models import User
 from django.forms.models import model_to_dict
 from django.utils.timesince import timesince
+from authentication.serializers import UserSerializer
 import os
 
 
@@ -52,3 +53,14 @@ class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['caption']
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    created = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = [ 'id','user', 'body', 'created' ]
+    
+    def get_created(self, obj):
+        return timesince(obj.created)

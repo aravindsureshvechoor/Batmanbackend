@@ -5,8 +5,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.db.models import Q, Count
 from django.db import transaction
-from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer)
-from .models import Post
+from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer)
+from .models import Post,Comment
 from authentication.models import User
 
 
@@ -90,3 +90,33 @@ class LikeView(APIView):
             return Response("Post not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class CreateCommentView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CommentSerializer
+
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            user = request.user
+            body = request.data.get('body')
+            print(request.data, body)
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=user, post_id=pk, body=body)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                print(serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+class DeleteCommentView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            comment = Comment.objects.get(id=pk, user=request.user)
+            comment.delete()                        
+            return Response("Comment deleted successfully",status=status.HTTP_200_OK)
+        except Comment.DoesNotExist:
+            return Response("Not found in database", status=status.HTTP_404_NOT_FOUND)
