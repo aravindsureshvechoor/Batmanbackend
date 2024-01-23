@@ -46,6 +46,7 @@ class BlockUser(APIView):
         user.is_blocked = True
         user.save()
 
+
         return Response({'message': 'User blocked successfully'})
 
 class UnblockUser(APIView):

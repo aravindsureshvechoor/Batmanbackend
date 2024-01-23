@@ -35,13 +35,14 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['caption','post_img']
+        fields = ['caption','post_img','total_likes']
+        # fields = '__all__'
 
 class PostRetrieveSerializer(serializers.ModelSerializer):
     author_first_name = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['caption','post_img','author_first_name','created_at']
+        fields = ['id','caption','post_img','author_first_name','likes','created_at','total_likes']
     def get_author_first_name(self, obj):
         # Assuming 'author' is a ForeignKey field in Post model linking to User model
         # Adjust the field names accordingly if they are different in your models

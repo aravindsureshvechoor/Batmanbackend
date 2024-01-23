@@ -42,7 +42,7 @@ class CreatePostView(APIView):
 class ListPostOnUserSide(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self,request):
-        queryset = Post.objects.all()
+        queryset = Post.objects.all().order_by('-created_at')
         serializer = PostRetrieveSerializer(queryset, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
@@ -69,3 +69,24 @@ class UserPostUpdateView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LikeView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+            user = request.user
+            if user in post.likes.all():
+                post.likes.remove(user)
+                return Response("Like removed", status=status.HTTP_200_OK)
+            else:
+                post.likes.add(user) 
+                likeCount = post.total_likes()
+                responsedata= {"msg":"Like added", "likeCount":likeCount}
+                return Response(responsedata, status=status.HTTP_200_OK)
+        except Post.DoesNotExist:
+            return Response("Post not found", status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
