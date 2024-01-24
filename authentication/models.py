@@ -19,7 +19,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     profile_image = models.ImageField(blank=True, null=True, upload_to=upload_to, default='user.png')
-    # age = models.IntegerField(validators=[MinValueValidator(18), MaxValueValidator(99)])
     gender = models.CharField(max_length=50)
     is_online = models.BooleanField(default=False)
     set_interest = models.BooleanField(default=False)
@@ -56,3 +55,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_following_count(self):
         return self.following.count()
+
+class Follow(models.Model):
+    following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.follower} follows {self.following}"

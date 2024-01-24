@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework import status,permissions
 from django.contrib.auth import get_user_model,authenticate
+from .models import Follow
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from datetime import timedelta 
@@ -18,6 +19,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken
 import jwt
 from .tasks import (welcomemail,otp)
+from django.db import transaction
 
 
 # Create your views here
@@ -211,3 +213,30 @@ class Retrieveuserdetails(APIView):
         user = User.objects.exclude(is_staff=True)
         serializer = UserRetrieveSerializer(user,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+class FollowView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            following = User.objects.get(id=pk)
+            follower = request.user
+            follow_instance = Follow.objects.filter(following=following, follower=follower).first()
+            # print(following)
+            # print(follower)
+            if follow_instance:
+                # Unfollow 
+                with transaction.atomic():
+                    follow_instance.delete()
+                return Response("Unfollowed", status=status.HTTP_200_OK)
+            else:
+                # Follow 
+                with transaction.atomic():
+                    follow = Follow(following=following, follower=follower)
+                    follow.save()
+                return Response("Followed", status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

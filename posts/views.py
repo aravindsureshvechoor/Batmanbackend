@@ -136,7 +136,7 @@ class GetCommentsView(APIView):
 
     def get(self,request,pk):        
         comments = Comment.objects.filter(post_id=pk)
-        print(comments,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        print(comments,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&cod")
         serializer =CommentretrieveSerializer(comments,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
