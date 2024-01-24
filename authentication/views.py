@@ -8,7 +8,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.views import View
 from django.utils.decorators import method_decorator
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.http import JsonResponse
@@ -18,8 +18,10 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken
 import jwt
+from django.db.models import Q, Count
 from .tasks import (welcomemail,otp)
 from django.db import transaction
+
 
 
 # Create your views here
@@ -240,3 +242,24 @@ class FollowView(APIView):
             return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class FollowListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        current_user = self.request.user
+        queryset = User.objects.filter(Q(followers__follower=current_user) & ~Q(id=current_user.id))
+        return queryset
+    
+
+
+
+class FollowerListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        current_user = self.request.user
+        queryset = User.objects.filter(Q(following__following=current_user) & ~Q(id=current_user.id))
+        return queryset
