@@ -37,7 +37,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['caption','post_img','total_likes']
-        # fields = '__all__'
+        
 
 class PostRetrieveSerializer(serializers.ModelSerializer):
     author_first_name = serializers.SerializerMethodField()
@@ -64,3 +64,15 @@ class CommentSerializer(serializers.ModelSerializer):
     
     def get_created(self, obj):
         return timesince(obj.created)
+
+class CommentretrieveSerializer(serializers.ModelSerializer):
+    user_first_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Comment
+        fields = ['id','body','created','user_first_name']
+    def get_user_first_name(self, obj):
+        # Assuming 'author' is a ForeignKey field in Post model linking to User model
+        # Adjust the field names accordingly if they are different in your models
+        return obj.user.first_name if obj.user else None
+    

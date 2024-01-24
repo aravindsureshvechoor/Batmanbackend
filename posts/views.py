@@ -5,10 +5,11 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.db.models import Q, Count
 from django.db import transaction
-from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer)
+from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
+CommentretrieveSerializer)
 from .models import Post,Comment
 from authentication.models import User
-
+import json
 
 # Create your views here.
 class CreatePostView(APIView):
@@ -128,3 +129,20 @@ class DeleteCommentView(APIView):
             return Response("Comment deleted successfully",status=status.HTTP_200_OK)
         except Comment.DoesNotExist:
             return Response("Not found in database", status=status.HTTP_404_NOT_FOUND)
+
+
+class GetCommentsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self,request,pk):        
+        comments = Comment.objects.filter(post_id=pk)
+        print(comments,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        serializer =CommentretrieveSerializer(comments,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+
+
+            
+            
+            
