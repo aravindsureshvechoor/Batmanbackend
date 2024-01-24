@@ -1,10 +1,12 @@
 from django.urls import path
-from .views import CreatePostView,ListPostOnUserSide,UserPostDeleteView,UserPostUpdateView,LikeView,CreateCommentView,DeleteCommentView
+from .views import (CreatePostView,ListPostOnUserSide,UserPostDeleteView,UserPostUpdateView,
+LikeView,CreateCommentView,DeleteCommentView,ListSinglePostOnUserSide)
 
 
 urlpatterns = [
     path('create/', CreatePostView.as_view()), 
     path('get/', ListPostOnUserSide.as_view()),
+    path('singlepostforcomment/<int:pk>/', ListSinglePostOnUserSide.as_view()),
     path('delete/<int:pk>/', UserPostDeleteView.as_view()),  
     path('update/<int:pk>/', UserPostUpdateView.as_view()),  
     path('like/<int:pk>/', LikeView.as_view()),  

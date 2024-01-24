@@ -46,6 +46,14 @@ class ListPostOnUserSide(APIView):
         serializer = PostRetrieveSerializer(queryset, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+# //////////////BELOW API IS TO DISPLAY A SINGLE POST ON COMMENT SECTION
+class ListSinglePostOnUserSide(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self,request,pk):
+        post = Post.objects.get(id=pk)
+        serializer = PostRetrieveSerializer(post)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
 class UserPostDeleteView(APIView):
     def delete(self, request, pk, format=None):
         try:
