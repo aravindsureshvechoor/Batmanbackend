@@ -18,6 +18,22 @@ class UserSignupSerializer(serializers.ModelSerializer):
     class Meta:
         model  = User
         fields = ['email', 'first_name', 'last_name','password','gender']
+
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        # Use Django's built-in EmailValidator for basic email format validation
+        from django.core.validators import EmailValidator
+        email_validator = EmailValidator(message="Enter a valid email address.")
+
+        try:
+            # This will raise a ValidationError if the email is not valid
+            email_validator(value)
+        except serializers.ValidationError:
+            raise serializers.ValidationError("Custom email validation failed. Please provide a valid email.")
+
+
+        return value
     
     def create(self, validated_data):
         user = User.objects.create_user(

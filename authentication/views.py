@@ -34,6 +34,7 @@ class Signup(APIView):
         data            = request.data
         print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&',request.data)
         user_serializer = UserSignupSerializer(data = data)
+        print(user_serializer.is_valid(),'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
