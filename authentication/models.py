@@ -23,6 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_online = models.BooleanField(default=False)
     set_interest = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
+    otp = models.CharField(max_length=4,null=True)
     
     groups = models.ManyToManyField(
         "auth.Group",
@@ -62,3 +63,4 @@ class Follow(models.Model):
     
     def __str__(self):
         return f"{self.follower} follows {self.following}"
+

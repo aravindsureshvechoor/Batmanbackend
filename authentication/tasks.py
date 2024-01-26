@@ -17,7 +17,7 @@ def welcomemail(email):
 @shared_task
 def otp(email):
     randomotp = str(random.randint(1000, 9999))
-    
+ 
     subject = "OTP"
     sendermail = "Batman Community"
     otp = f"{randomotp}"

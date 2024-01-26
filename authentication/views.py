@@ -32,13 +32,10 @@ User = get_user_model()
 class Signup(APIView):
     def post(self,request):
         data            = request.data
-        print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&',request.data)
+       
         user_serializer = UserSignupSerializer(data = data)
-        print(user_serializer.is_valid(),'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
-        
 
         user            = user_serializer.create(user_serializer.validated_data)
         user.is_active  = False
@@ -46,15 +43,13 @@ class Signup(APIView):
         serializer      = UserSerializer(user)
         user            = serializer.data
 
+        email = request.data.get('email', None)
         #calling the celery task to send otp to the user
         otp_result=otp.delay(user['email'])
-
-         # Storing the generated OTP in the session
-        request.session['storedotp'] = otp_result.get()  # Get the result of the Celery task (the OTP)
-        request.session.modified = True
-        request.session.set_expiry(300)
-
-        email = request.data.get('email', None)
+        otp_value = otp_result.get()
+        user = User.objects.get(email=email)
+        user.otp = otp_value
+        user.save()
 
         return Response({"detail": "OTP sent successfully","email":email}, status=status.HTTP_200_OK)
 
@@ -62,9 +57,8 @@ class Signup(APIView):
 
 class VerifyOTP(APIView):
     def post(self, request):
-        
-        print(request.data,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        entered_otp = request.data.get('otp', '')
+
+        entered_otp = request.data.get('Otp', '')
         
         user_mail = request.data.get('email')
 
@@ -73,10 +67,14 @@ class VerifyOTP(APIView):
 
         user = User.objects.get(email=user_mail)  # Replace YourUserModel with your actual User model
 
-        stored_otp = request.session.get('storedotp', '')
+        stored_otp = user.otp
+        
+       
 
+        
         if entered_otp == stored_otp:
             user.is_active = True
+            user.otp = None
             user.save()
 
             serializer = UserSerializer(user)
@@ -85,12 +83,10 @@ class VerifyOTP(APIView):
             # Call the Celery task after successful user registration
             welcomemail.delay(user_data['email'])
 
-            # Clear the session data
-            # del request.session['user_id']
-            # del request.session['storedotp']
-
             return Response({"detail": "User registered successfully"}, status=status.HTTP_200_OK)
         else:
+            user = User.objects.get(email=user_mail)
+            user.delete()
             return Response({"detail": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
 
 
