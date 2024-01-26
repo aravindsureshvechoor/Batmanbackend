@@ -16,7 +16,6 @@ def welcomemail(email):
 
 @shared_task
 def otp(email):
-     #setting otp in the session and sending it to the user
     randomotp = str(random.randint(1000, 9999))
     
     subject = "OTP"
