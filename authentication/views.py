@@ -260,3 +260,16 @@ class FollowerListView(generics.ListAPIView):
         current_user = self.request.user
         queryset = User.objects.filter(Q(following__following=current_user) & ~Q(id=current_user.id))
         return queryset
+
+# the below provided api is to check if the user is blocked in regular intervals of time>
+
+class UserStatus(APIView):
+    def get(self,request,email):
+        print(email,"EEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        user = User.objects.get(email=email)
+        if user.is_blocked == True:
+            status = {"BLOCKED" : "user is blocked"}
+            return Response(status)
+        else:
+            status = {"NOTBLOCKED" : "user is not blocked"}
+            return Response(status)
