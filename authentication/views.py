@@ -124,14 +124,14 @@ class UserLogin(APIView):
                         "name": user.first_name,
                     }
                 })
-                response.set_cookie(
-                    key = settings.SIMPLE_JWT['AUTH_COOKIE'],
-                    value = data["access"],
-                    expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-                    secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-                    httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-                    samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-                )
+                # response.set_cookie(
+                #     key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                #     value = data["access"],
+                #     expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                #     secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                #     httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                #     samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                # )
 
                 response.data = {"Success" : "Login successfully","data":data}
                 return response
@@ -146,43 +146,16 @@ class GoogleAuth(APIView):
         data = request.data
         print('*****', data)
         email = data.get('email', None)
+        token = data.get('token')
 
         
-
-        if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
-
-            if user.is_blocked == True:
-                return Response({"Blocked" : "This account is blocked!!"}, status=status.HTTP_404_NOT_FOUND)
-
-            if user is not None:
-                if user.is_active:
-                    data = get_tokens_for_user(user)
-                    response = JsonResponse({
-                        "data": data,
-                        "user": {
-                            "id": user.id,
-                            "email": user.email,
-                            "name": user.first_name,
-                        }
-                    })
-                    response.set_cookie(
-                        key = settings.SIMPLE_JWT['AUTH_COOKIE'],
-                        value = data["access"],
-                        expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-                        secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-                        httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-                        samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-                    )
-                
-                    response.data = {"Success" : "Login successfully","data":data}
-                    return response
-        else:
-            serializer = GoogleUserSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
+        if token:
             if User.objects.filter(email=email).exists():
                 user = User.objects.get(email=email)
+
+                if user.is_blocked == True:
+                    return Response({"Blocked" : "This account is blocked!!"}, status=status.HTTP_404_NOT_FOUND)
+
                 if user is not None:
                     if user.is_active:
                         data = get_tokens_for_user(user)
@@ -194,17 +167,49 @@ class GoogleAuth(APIView):
                                 "name": user.first_name,
                             }
                         })
-                        response.set_cookie(
-                            key = settings.SIMPLE_JWT['AUTH_COOKIE'],
-                            value = data["access"],
-                            expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-                            secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
-                            httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
-                            samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
-                        )
-
+                        # response.set_cookie(
+                        #     key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                        #     value = data["access"],
+                        #     expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                        #     secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                        #     httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                        #     samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                        # )
+                    
                         response.data = {"Success" : "Login successfully","data":data}
-                        return response 
+                        return response
+            else:
+                serializer = GoogleUserSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                if User.objects.filter(email=email).exists():
+                    user = User.objects.get(email=email)
+                    if user is not None:
+                        if user.is_active:
+                            data = get_tokens_for_user(user)
+                            response = JsonResponse({
+                                "data": data,
+                                "user": {
+                                    "id": user.id,
+                                    "email": user.email,
+                                    "name": user.first_name,
+                                }
+                            })
+                            # response.set_cookie(
+                            #     key = settings.SIMPLE_JWT['AUTH_COOKIE'],
+                            #     value = data["access"],
+                            #     expires = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                            #     secure = settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                            #     httponly = settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                            #     samesite = settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+                            # )
+
+                            response.data = {"Success" : "Login successfully","data":data}
+                            return response 
+        else:
+             status = {"TOKENNOTFOUND" : "AUTHENTICATION FAILED"}
+             return Response(status)             
+
 
 
 class Retrieveuserdetails(APIView):
