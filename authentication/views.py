@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework import status,permissions
 from django.contrib.auth import get_user_model,authenticate
 from .models import Follow
+from posts.models import Post
+from posts.serializers import PostRetrieveSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from datetime import timedelta 
@@ -267,7 +269,6 @@ class FollowerListView(generics.ListAPIView):
         return queryset
 
 # the below provided api is to check if the user is blocked in regular intervals of time>
-
 class UserStatus(APIView):
     def get(self,request,email):
         print(email,"EEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
@@ -278,3 +279,18 @@ class UserStatus(APIView):
         else:
             status = {"NOTBLOCKED" : "user is not blocked"}
             return Response(status)
+
+# this api is to give the user data to the frontend
+class UserRetrieveView(APIView):
+    def get(self,request,email):
+        user = User.objects.get(email=email)
+        serializer = UserRetrieveSerializer(user)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+# this api is to give the users post to the userprofile
+class UserPostRetrieve(APIView):
+    def get(self,request,email):
+        user = User.objects.get(email=email)
+        post = Post.objects.filter(author=user)
+        serializer = PostRetrieveSerializer(post,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)

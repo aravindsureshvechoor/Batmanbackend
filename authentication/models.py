@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
 from .managers import UserAccountManager
 
+
 def upload_to(instance, filename):
     return 'profile/{filename}'.format(filename=filename)
 
@@ -40,9 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text="Specific permissions for this user.",
     )
 
-
-
-
     objects = UserAccountManager()
 
     USERNAME_FIELD = "email"
@@ -56,6 +54,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_following_count(self):
         return self.following.count()
+
+
 
 class Follow(models.Model):
     following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)

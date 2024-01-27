@@ -2,6 +2,7 @@ from django.db import models
 from authentication.models import User
 
 
+
 # Create your models here.
 def upload_post(instance, filename):
     return 'posts/{filename}'.format(filename=filename)
@@ -26,6 +27,8 @@ class Post(models.Model):
 
     def total_likes(self):
         return self.likes.count()
+
+    
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)

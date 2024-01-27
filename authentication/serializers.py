@@ -8,6 +8,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.exceptions import ValidationError as DRFValidationError
 import os
+from django.apps import apps
 
 
 
@@ -84,6 +85,21 @@ class GoogleUserSerializer(serializers.ModelSerializer):
         return user
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
+    follower_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    post_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ['id','email','first_name','last_name','is_blocked']
+        fields = ['id','email','first_name','last_name','is_blocked','profile_image','follower_count','following_count','post_count']
+    def get_follower_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.following.count()
+
+    def get_post_count(self, obj):
+        Post = apps.get_model('posts', 'Post')
+        return Post.objects.filter(author=obj).count()
+
+    
