@@ -7,7 +7,7 @@ from django.db.models import Q, Count
 from django.db import transaction
 from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
 CommentretrieveSerializer)
-from .models import Post,Comment
+from .models import Post,Comment,SavedPost
 from authentication.models import User
 import json
 
@@ -136,13 +136,15 @@ class GetCommentsView(APIView):
 
     def get(self,request,pk):        
         comments = Comment.objects.filter(post_id=pk)
-        print(comments,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&cod")
         serializer =CommentretrieveSerializer(comments,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
-
-
-
+# this api is to save post to users collection
+# class SavePosts(APIView):
+#     def post(self,request, *args, **kwargs):
+#         user = request.user
+#         post = 
+        
             
             
             
