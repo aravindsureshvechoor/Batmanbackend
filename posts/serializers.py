@@ -42,17 +42,16 @@ class PostSerializer(serializers.ModelSerializer):
 class PostRetrieveSerializer(serializers.ModelSerializer):
     author_first_name = serializers.SerializerMethodField()
     author_last_name = serializers.SerializerMethodField()
+    author_email = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['id','caption','post_img','author_first_name','author_last_name','likes','created_at','total_likes']
+        fields = ['id','author_email','caption','post_img','author_first_name','author_last_name','likes','created_at','total_likes']
     def get_author_first_name(self, obj):
-        # Assuming 'author' is a ForeignKey field in Post model linking to User model
-        # Adjust the field names accordingly if they are different in your models
         return obj.author.first_name if obj.author else None
     def get_author_last_name(self, obj):
-        # Assuming 'author' is a ForeignKey field in Post model linking to User model
-        # Adjust the field names accordingly if they are different in your models
         return obj.author.last_name if obj.author else None
+    def get_author_email(self,obj):
+        return obj.author.email if obj.author else None
 
 class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:

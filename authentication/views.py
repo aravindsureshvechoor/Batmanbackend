@@ -262,9 +262,9 @@ class UserStatus(APIView):
 # this api is to give the user data to the frontend
 class UserRetrieveView(APIView):
     def get(self,request,email):
-        user = User.objects.get(email=email)
-        serializer = UserRetrieveSerializer(user)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+            user = User.objects.get(email=email)
+            serializer = UserRetrieveSerializer(user)
+            return Response(serializer.data,status=status.HTTP_200_OK)
 
 # this api is to give the users post to the userprofile
 class UserPostRetrieve(APIView):
