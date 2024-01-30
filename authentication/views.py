@@ -202,9 +202,9 @@ class Retrieveuserdetails(APIView):
 class FollowView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, pk):
+    def post(self, request, email):
         try:
-            following = User.objects.get(id=pk)
+            following = User.objects.get(email=email)
             follower = request.user
             follow_instance = Follow.objects.filter(following=following, follower=follower).first()
             # print(following)
