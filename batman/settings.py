@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'django.contrib.admin',
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentication',
+    'Chatapp',
     'corsheaders',
     'adminbatman',
     'posts',
@@ -78,8 +80,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'batman.wsgi.application'
+# WSGI_APPLICATION = 'batman.wsgi.application'
+ASGI_APPLICATION = 'batman.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
