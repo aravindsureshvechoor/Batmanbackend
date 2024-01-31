@@ -15,11 +15,15 @@ def welcomemail(email):
     send_mail(subject, message, sendermail, [email])
 
 @shared_task
-def otp(email):
-    randomotp = str(random.randint(1000, 9999))
+def otp(email, subject="OTP", sender_name="Batman Community"):
+    random_otp = str(random.randint(1000, 9999))
  
-    subject = "OTP"
-    sendermail = "Batman Community"
-    otp = f"{randomotp}"
-    send_mail(subject,otp,sendermail,[email])
-    return randomotp
+    message = f"Your one-time password is: {random_otp}"
+
+    try:
+        send_mail(subject, message, sender_name, [email])
+        return random_otp
+    except Exception as e:
+        # Handle email sending failure
+        print(f"Failed to send OTP email to {email}. Error: {str(e)}")
+        return None

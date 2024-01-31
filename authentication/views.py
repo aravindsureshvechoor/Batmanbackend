@@ -67,7 +67,7 @@ class VerifyOTP(APIView):
         if not user_mail:
             return Response({"detail": "User mail not found in request"}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(email=user_mail)  # Replace YourUserModel with your actual User model
+        user = User.objects.get(email=user_mail)  
 
         stored_otp = user.otp
         
@@ -250,7 +250,6 @@ class FollowerListView(generics.ListAPIView):
 # the below provided api is to check if the user is blocked in regular intervals of time>
 class UserStatus(APIView):
     def get(self,request,email):
-        print(email,"EEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
         user = User.objects.get(email=email)
         if user.is_blocked == True:
             status = {"BLOCKED" : "user is blocked"}
