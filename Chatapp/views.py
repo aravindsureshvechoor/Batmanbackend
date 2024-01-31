@@ -40,6 +40,7 @@ class RoomMessagesView(APIView):
     serializer_class = MessageSerializer
  
     def get(self, request, pk):
+        
         try:
             room = ChatRoom.objects.get(pk=pk)
             messages = Message.objects.filter(room=room)
