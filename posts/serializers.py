@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post,Comment
+from .models import Post,Comment,SavedPost
 from authentication.models import User
 from django.forms.models import model_to_dict
 from django.utils.timesince import timesince
@@ -80,3 +80,9 @@ class CommentretrieveSerializer(serializers.ModelSerializer):
         # Adjust the field names accordingly if they are different in your models
         return obj.user.first_name if obj.user else None
     
+class SavedPostSerializer(serializers.ModelSerializer):
+    post = PostSerializer(read_only=True)
+
+    class Meta:
+        model = SavedPost
+        fields = '__all__'

@@ -4,9 +4,9 @@ from rest_framework import permissions, status, generics,viewsets
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.db.models import Q, Count
-from django.db import transaction
+from django.db import transaction,IntegrityError
 from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
-CommentretrieveSerializer)
+CommentretrieveSerializer,SavedPostSerializer)
 from .models import Post,Comment,SavedPost
 from authentication.models import User
 import json
@@ -139,12 +139,20 @@ class GetCommentsView(APIView):
         serializer =CommentretrieveSerializer(comments,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
-# this api is to save post to users collection
-# class SavePosts(APIView):
-#     def post(self,request, *args, **kwargs):
-#         user = request.user
-#         post = 
-        
-            
-            
+class SavePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request,pk):
+        try:
+            post = Post.objects.get(id=pk)
+            user = post.author
+
+            saved_post = SavedPost.objects.create(user=user, post=post)
+            serializer = SavedPostSerializer(saved_post)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Post.DoesNotExist:
+            return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)     
+        except IntegrityError:
+            return Response({"error": "SavedPost already exists for this user and post."}, status=status.HTTP_400_BAD_REQUEST)
             
