@@ -48,6 +48,8 @@ class Signup(APIView):
         email = request.data.get('email', None)
         #calling the celery task to send otp to the user
         otp_result=otp.delay(user['email'])
+
+       
         otp_value = otp_result.get()
         user = User.objects.get(email=email)
         user.otp = otp_value
@@ -249,6 +251,7 @@ class FollowerListView(generics.ListAPIView):
 
 # the below provided api is to check if the user is blocked in regular intervals of time>
 class UserStatus(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self,request,email):
         user = User.objects.get(email=email)
         if user.is_blocked == True:
@@ -260,6 +263,7 @@ class UserStatus(APIView):
 
 # this api is to give the user data to the frontend
 class UserRetrieveView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self,request,email):
             user = User.objects.get(email=email)
             serializer = UserRetrieveSerializer(user)
@@ -267,6 +271,7 @@ class UserRetrieveView(APIView):
 
 # this api is to give the users post to the userprofile
 class UserPostRetrieve(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self,request,email):
         user = User.objects.get(email=email)
         post = Post.objects.filter(author=user)

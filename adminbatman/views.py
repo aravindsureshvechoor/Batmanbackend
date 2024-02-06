@@ -60,3 +60,9 @@ class UnblockUser(APIView):
         user.save()
 
         return Response({'message': 'User Unblocked successfully'})
+
+class Deleteunregisteredusers(APIView):
+    def delete(self, request):
+        unregistered_users = User.objects.filter(otp__isnull=False)
+        deleted_count = unregistered_users.delete()[0]
+        return Response({"message": f"{deleted_count} unregistered users deleted."})

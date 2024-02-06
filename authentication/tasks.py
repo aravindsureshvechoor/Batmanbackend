@@ -26,4 +26,5 @@ def otp(email, subject="OTP", sender_name="Batman Community"):
     except Exception as e:
         # Handle email sending failure
         print(f"Failed to send OTP email to {email}. Error: {str(e)}")
-        return None
+        error_response = {"status": "error", "message": f"Invalid email: {email}"}
+        return error_response

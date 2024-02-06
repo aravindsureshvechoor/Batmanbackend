@@ -53,7 +53,7 @@ class RoomMessagesView(APIView):
 
 class ChatRoomListView(generics.ListAPIView):
     serializer_class = ChatRoomListSerializer
-
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         user = self.request.user
         return ChatRoom.objects.filter(members=user)

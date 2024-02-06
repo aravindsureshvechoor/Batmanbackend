@@ -56,6 +56,7 @@ class ListSinglePostOnUserSide(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 class UserPostDeleteView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def delete(self, request, pk, format=None):
         try:
             instance = Post.objects.get(pk=pk)
@@ -67,6 +68,7 @@ class UserPostDeleteView(APIView):
         
 
 class UserPostUpdateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def put(self, request, pk, format=None):
         try:
             instance = Post.objects.get(pk=pk)
