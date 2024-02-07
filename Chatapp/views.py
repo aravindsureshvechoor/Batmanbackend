@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import permissions, status, generics
 from rest_framework.response import Response
-
+from authentication.models import User,Follow
+from authentication.serializers import UserSerializer
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
@@ -57,3 +58,12 @@ class ChatRoomListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return ChatRoom.objects.filter(members=user)
+
+class ContactListAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self,request):
+        user = request.user
+        followed_users = Follow.objects.filter(follower=request.user).values_list('following', flat=True)
+        contactlist = User.objects.filter(id__in=followed_users)
+        serializer = UserSerializer(contactlist, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)

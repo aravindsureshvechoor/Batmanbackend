@@ -8,7 +8,7 @@ from django.db import transaction,IntegrityError
 from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
 CommentretrieveSerializer,SavedPostSerializer)
 from .models import Post,Comment,SavedPost
-from authentication.models import User
+from authentication.models import User,Follow
 import json
 
 # Create your views here.
@@ -43,9 +43,15 @@ class CreatePostView(APIView):
 class ListPostOnUserSide(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self,request):
-        queryset = Post.objects.all().order_by('-created_at')
+        # Get the authors followed by the current user
+        followed_authors = Follow.objects.filter(follower=request.user).values_list('following', flat=True)
+        print(followed_authors)
+        # Filter the queryset to get posts authored by followed users
+        queryset = Post.objects.filter(author__in=followed_authors).order_by('-created_at')
         serializer = PostRetrieveSerializer(queryset, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+        
 
 # //////////////BELOW API IS TO DISPLAY A SINGLE POST ON COMMENT SECTION
 class ListSinglePostOnUserSide(APIView):
