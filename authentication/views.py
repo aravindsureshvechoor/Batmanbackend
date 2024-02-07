@@ -280,6 +280,12 @@ class UserPostRetrieve(APIView):
 class PeopleYouMayKnow(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self,request):
-        users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
+        users = User.objects.filter(
+        is_staff=False
+        ).exclude(
+            id=request.user.id
+        ).exclude(
+            id__in=Follow.objects.filter(follower=request.user).values('following')
+        )
         serializer = UserSerializer(users,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
