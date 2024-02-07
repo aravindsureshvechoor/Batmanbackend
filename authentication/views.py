@@ -141,7 +141,6 @@ class UserLogin(APIView):
 class GoogleAuth(APIView):
     def post(self, request):
         data = request.data
-        print('*****', data)
         email = data.get('email', None)
         token = data.get('token')
 
@@ -251,7 +250,6 @@ class FollowerListView(generics.ListAPIView):
 
 # the below provided api is to check if the user is blocked in regular intervals of time>
 class UserStatus(APIView):
-    permission_classes = [permissions.IsAuthenticated]
     def get(self,request,email):
         user = User.objects.get(email=email)
         if user.is_blocked == True:
@@ -278,3 +276,10 @@ class UserPostRetrieve(APIView):
         serializer = PostRetrieveSerializer(post,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+# this api is to give all the user data to the people you may know portion in the frontend
+class PeopleYouMayKnow(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self,request):
+        users = User.objects.filter(is_staff=False).exclude(id=request.user.id)
+        serializer = UserSerializer(users,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
