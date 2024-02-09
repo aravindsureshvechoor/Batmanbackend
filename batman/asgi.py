@@ -16,13 +16,13 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from Chatapp.routing import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'batman.settings')
-
+from posts.routing import websocket_urlpatterns as notification_url
 
 application = ProtocolTypeRouter(
     {
         'http': get_asgi_application(),
         'websocket': JwtAuthMiddleware(
-            AllowedHostsOriginValidator(URLRouter(websocket_urlpatterns))
+            AllowedHostsOriginValidator(URLRouter(websocket_urlpatterns+notification_url))
         )
     }
 )

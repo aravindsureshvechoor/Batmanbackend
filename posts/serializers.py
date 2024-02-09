@@ -1,13 +1,11 @@
 from rest_framework import serializers
 from .models import Post,Comment,SavedPost
 from authentication.models import User
+from . models import Notification
 from django.forms.models import model_to_dict
 from django.utils.timesince import timesince
 from authentication.serializers import UserSerializer
 import os
-
-
-
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -86,3 +84,22 @@ class SavedPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = SavedPost
         fields = '__all__'
+
+class UserNotifySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'email')
+
+class NotificationSerializer(serializers.ModelSerializer):
+    from_user = UserNotifySerializer(read_only=True)
+
+    class Meta:
+        model = Notification
+        fields = '__all__'
+        read_only_fields = ('notification_type',)
+
+    def validate_notification_type(self, value):
+        choices = dict(Notification.NOTIFICATION_TYPES)
+        if value not in choices:
+            raise serializers.ValidationError("Invalid notification type.")
+        return value

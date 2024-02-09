@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from django.db.models import Q, Count
 from django.db import transaction,IntegrityError
 from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
-CommentretrieveSerializer,SavedPostSerializer)
-from .models import Post,Comment,SavedPost
+CommentretrieveSerializer,SavedPostSerializer,NotificationSerializer)
+from .models import Post,Comment,SavedPost,Notification
 from authentication.models import User,Follow
 import json
 
@@ -101,6 +101,13 @@ class LikeView(APIView):
             else:
                 post.likes.add(user) 
                 likeCount = post.total_likes()
+                if not post.author == user:
+                    Notification.objects.create(
+                        from_user=user,
+                        to_user=post.author,
+                        post=post,
+                        notification_type=Notification.NOTIFICATION_TYPES[0][0],
+                    )
                 responsedata= {"msg":"Like added", "likeCount":likeCount}
                 return Response(responsedata, status=status.HTTP_200_OK)
         except Post.DoesNotExist:
@@ -164,3 +171,32 @@ class SavePostView(APIView):
         except IntegrityError:
             return Response({"error": "SavedPost already exists for this user and post."}, status=status.HTTP_400_BAD_REQUEST)
             
+class NotificationsView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Notification.objects.filter(to_user=user).exclude(is_seen=True).order_by('-created')
+
+    def get(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class NotificationsSeenView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = NotificationSerializer
+
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            notification = Notification.objects.get(pk=pk)
+            notification.is_seen = True
+            notification.save()
+            return Response(status=status.HTTP_200_OK)
+        except Post.DoesNotExist:
+            return Response("Not found in database", status=status.HTTP_404_NOT_FOUND)

@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework import status,permissions
 from django.contrib.auth import get_user_model,authenticate
 from .models import Follow
-from posts.models import Post
+from posts.models import Post,Notification
 from posts.serializers import PostRetrieveSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -214,12 +214,23 @@ class FollowView(APIView):
                 # Unfollow 
                 with transaction.atomic():
                     follow_instance.delete()
+                notifications = Notification.objects.filter(
+                    from_user=follower,
+                    to_user=following,
+                    notification_type=Notification.NOTIFICATION_TYPES[2][0],
+                )
+                notifications.delete()
                 return Response("Unfollowed", status=status.HTTP_200_OK)
             else:
                 # Follow 
                 with transaction.atomic():
                     follow = Follow(following=following, follower=follower)
                     follow.save()
+                Notification.objects.create(
+                    from_user=follower,
+                    to_user=following,
+                    notification_type=Notification.NOTIFICATION_TYPES[2][0],
+                )
                 return Response("Followed", status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
@@ -289,3 +300,5 @@ class PeopleYouMayKnow(APIView):
         )
         serializer = UserSerializer(users,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
