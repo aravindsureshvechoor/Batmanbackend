@@ -34,7 +34,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['caption','post_img','total_likes']
+        fields = ['caption','post_img','total_likes','id']
         
 
 class PostRetrieveSerializer(serializers.ModelSerializer):
@@ -86,22 +86,22 @@ class SavedPostSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RetrieveSavedPostSerializer(serializers.ModelSerializer):
-    po_st = serializers.SerializerMethodField()
-    us_er = serializers.SerializerMethodField()
+    post = serializers.SerializerMethodField()
+    # us_er = serializers.SerializerMethodField()
 
     class Meta:
         model = SavedPost
-        fields = ['us_er', 'po_st']
+        fields = ['post']
 
-    def get_po_st(self, obj):
+    def get_post(self, obj):
         # Assuming you have a serializer for the Post model called PostSerializer
         post_serializer = PostSerializer(obj.post)
         return post_serializer.data
 
-    def get_us_er(self, obj):
-        # Assuming you have a serializer for the User model called UserSerializer
-        user_serializer = UserSerializer(obj.user)
-        return user_serializer.data
+    # def get_us_er(self, obj):
+    #     # Assuming you have a serializer for the User model called UserSerializer
+    #     user_serializer = UserSerializer(obj.user)
+    #     return user_serializer.data
 
 class UserNotifySerializer(serializers.ModelSerializer):
     class Meta:

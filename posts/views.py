@@ -161,7 +161,7 @@ class SavePostView(APIView):
     def post(self, request,pk):
         try:
             post = Post.objects.get(id=pk)
-            user = post.author
+            user = request.user
 
             saved_post = SavedPost.objects.create(user=user, post=post)
             serializer = SavedPostSerializer(saved_post)
@@ -181,7 +181,6 @@ class RetrieveSavedPosts(APIView):
             serializer = RetrieveSavedPostSerializer(posts,many=True)
             return Response(serializer.data)
         except Exception as e:
-            print(e,"}[[[[[[[[[[]]]]]]]]]]")
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND) 
             
 class NotificationsView(generics.ListAPIView):
