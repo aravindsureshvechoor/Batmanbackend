@@ -85,6 +85,24 @@ class SavedPostSerializer(serializers.ModelSerializer):
         model = SavedPost
         fields = '__all__'
 
+class RetrieveSavedPostSerializer(serializers.ModelSerializer):
+    po_st = serializers.SerializerMethodField()
+    us_er = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SavedPost
+        fields = ['us_er', 'po_st']
+
+    def get_po_st(self, obj):
+        # Assuming you have a serializer for the Post model called PostSerializer
+        post_serializer = PostSerializer(obj.post)
+        return post_serializer.data
+
+    def get_us_er(self, obj):
+        # Assuming you have a serializer for the User model called UserSerializer
+        user_serializer = UserSerializer(obj.user)
+        return user_serializer.data
+
 class UserNotifySerializer(serializers.ModelSerializer):
     class Meta:
         model = User

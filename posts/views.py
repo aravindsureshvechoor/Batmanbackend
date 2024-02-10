@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.db.models import Q, Count
 from django.db import transaction,IntegrityError
 from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
-CommentretrieveSerializer,SavedPostSerializer,NotificationSerializer)
+CommentretrieveSerializer,SavedPostSerializer,NotificationSerializer,RetrieveSavedPostSerializer)
 from .models import Post,Comment,SavedPost,Notification
 from authentication.models import User,Follow
 import json
@@ -46,6 +46,8 @@ class ListPostOnUserSide(APIView):
         # Get the authors followed by the current user
         followed_authors = Follow.objects.filter(follower=request.user).values_list('following', flat=True)
         print(followed_authors)
+        followed_authors = list(followed_authors)
+        followed_authors.append(request.user.id)
         # Filter the queryset to get posts authored by followed users
         queryset = Post.objects.filter(author__in=followed_authors).order_by('-created_at')
         serializer = PostRetrieveSerializer(queryset, many=True)
@@ -170,6 +172,17 @@ class SavePostView(APIView):
             return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)     
         except IntegrityError:
             return Response({"error": "SavedPost already exists for this user and post."}, status=status.HTTP_400_BAD_REQUEST)
+
+class RetrieveSavedPosts(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self,request):
+        try:
+            posts = SavedPost.objects.filter(user=request.user)
+            serializer = RetrieveSavedPostSerializer(posts,many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(e,"}[[[[[[[[[[]]]]]]]]]]")
+            return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND) 
             
 class NotificationsView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
