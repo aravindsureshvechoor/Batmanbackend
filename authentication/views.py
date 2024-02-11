@@ -315,5 +315,5 @@ class UserProfileUpdate(APIView):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
         else:
-            print(serializer.error_messages,"############################")
+            print(serializer.errors,"############################")
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
