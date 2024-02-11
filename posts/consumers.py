@@ -9,7 +9,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.close()
         else:
             self.room_group_name = f"notify_{self.user.id}"
-            print(f"notify_{self.user.id}","********Consumer##############")
+            # print(f"notify_{self.user.id}","********Consumer##############")
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name

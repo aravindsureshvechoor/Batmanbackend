@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (Signup,UserLogin,GoogleAuth,VerifyOTP,Retrieveuserdetails,FollowView,FollowListView,
-FollowerListView,UserStatus,UserRetrieveView,UserPostRetrieve,PeopleYouMayKnow,UserProfileUpdate)
+FollowerListView,UserStatus,UserRetrieveView,UserPostRetrieve,PeopleYouMayKnow,UserProfileUpdate,UserSearchView)
 
 urlpatterns = [
     path('signup/', Signup.as_view()), 
@@ -16,5 +16,6 @@ urlpatterns = [
     path('retrieveuserpost/<str:email>/',UserPostRetrieve.as_view(),name='retrieveuserpost'),
     path('peopleyoumayknow/',PeopleYouMayKnow.as_view(),name='peopleyoumayknow'),
     path('userupdate/',UserProfileUpdate.as_view(),name='userprofileupdate'),
+    path('usersearch/',UserSearchView.as_view(),name='usersearch'),
 
 ]

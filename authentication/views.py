@@ -317,3 +317,18 @@ class UserProfileUpdate(APIView):
         else:
             print(serializer.errors,"############################")
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# this api helps a user to search another user
+class UserSearchView(generics.ListAPIView):
+    serializer_class = UserSerializer
+
+    def get(self, request):
+        query = request.query_params.get('query', '').strip().lower()
+        queryset = User.objects.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query)
+        )
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)

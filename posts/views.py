@@ -64,9 +64,10 @@ class ListSinglePostOnUserSide(APIView):
 
 class UserPostDeleteView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    def delete(self, request, pk, format=None):
+    def delete(self, request, postId, format=None):
+        print(request,"huuuuuurrrrrrrraaaaayyyyyyy")
         try:
-            instance = Post.objects.get(pk=pk)
+            instance = Post.objects.get(pk=postId)
         except Post.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
