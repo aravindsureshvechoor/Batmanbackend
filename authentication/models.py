@@ -14,12 +14,12 @@ def upload_to(instance, filename):
 # ]
 
 class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50,null=True,blank=True)
+    last_name = models.CharField(max_length=50,null=True,blank=True)
     email = models.EmailField(max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    profile_image = models.ImageField(blank=True, null=True, upload_to=upload_to, default='user.png')
+    profile_image = models.ImageField(blank=True, null=True, upload_to=upload_to,default='user.png')
     gender = models.CharField(max_length=50)
     is_online = models.BooleanField(default=False)
     set_interest = models.BooleanField(default=False)
@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserAccountManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name"]
+    # REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def __str__(self):
         return self.first_name

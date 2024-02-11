@@ -14,7 +14,8 @@ from rest_framework import status,generics
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.http import JsonResponse
-from .serializers import(UserSignupSerializer,UserSerializer,GoogleUserSerializer,UserRetrieveSerializer)
+from .serializers import(UserSignupSerializer,UserSerializer,GoogleUserSerializer,UserRetrieveSerializer,
+UserUpdateSerializer)
 from rest_framework.views import exception_handler
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -301,4 +302,18 @@ class PeopleYouMayKnow(APIView):
         serializer = UserSerializer(users,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
-
+# this api is to update user profile
+class UserProfileUpdate(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def put(self,request,format=None):
+        try:
+            user=User.objects.get(id=request.user.id)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = UserUpdateSerializer(user,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            print(serializer.error_messages,"############################")
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

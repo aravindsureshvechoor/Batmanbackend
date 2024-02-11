@@ -102,3 +102,7 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
         Post = apps.get_model('posts', 'Post')
         return Post.objects.filter(author=obj).count()
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name','last_name','profile_image']

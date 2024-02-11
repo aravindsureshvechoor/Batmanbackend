@@ -45,7 +45,6 @@ class ListPostOnUserSide(APIView):
     def get(self,request):
         # Get the authors followed by the current user
         followed_authors = Follow.objects.filter(follower=request.user).values_list('following', flat=True)
-        print(followed_authors)
         followed_authors = list(followed_authors)
         followed_authors.append(request.user.id)
         # Filter the queryset to get posts authored by followed users

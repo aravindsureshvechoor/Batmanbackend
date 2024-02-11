@@ -41,6 +41,7 @@ class PostRetrieveSerializer(serializers.ModelSerializer):
     author_first_name = serializers.SerializerMethodField()
     author_last_name = serializers.SerializerMethodField()
     author_email = serializers.SerializerMethodField()
+    # author_profile_image = serializers.ImageField()
     class Meta:
         model = Post
         fields = ['id','author_email','caption','post_img','author_first_name','author_last_name','likes','created_at','total_likes']
@@ -50,6 +51,8 @@ class PostRetrieveSerializer(serializers.ModelSerializer):
         return obj.author.last_name if obj.author else None
     def get_author_email(self,obj):
         return obj.author.email if obj.author else None
+    # def get_author_profile_image(self,obj):
+    #     return obj.author.profile_image if obj.author else None
 
 class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -74,8 +77,6 @@ class CommentretrieveSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id','body','created','user_first_name']
     def get_user_first_name(self, obj):
-        # Assuming 'author' is a ForeignKey field in Post model linking to User model
-        # Adjust the field names accordingly if they are different in your models
         return obj.user.first_name if obj.user else None
     
 class SavedPostSerializer(serializers.ModelSerializer):
@@ -87,21 +88,16 @@ class SavedPostSerializer(serializers.ModelSerializer):
 
 class RetrieveSavedPostSerializer(serializers.ModelSerializer):
     post = serializers.SerializerMethodField()
-    # us_er = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = SavedPost
         fields = ['post']
 
     def get_post(self, obj):
-        # Assuming you have a serializer for the Post model called PostSerializer
         post_serializer = PostSerializer(obj.post)
         return post_serializer.data
 
-    # def get_us_er(self, obj):
-    #     # Assuming you have a serializer for the User model called UserSerializer
-    #     user_serializer = UserSerializer(obj.user)
-    #     return user_serializer.data
 
 class UserNotifySerializer(serializers.ModelSerializer):
     class Meta:
