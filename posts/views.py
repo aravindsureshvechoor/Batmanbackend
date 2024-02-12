@@ -7,8 +7,9 @@ from django.db.models import Q, Count
 from django.db import transaction,IntegrityError
 from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
 CommentretrieveSerializer,SavedPostSerializer,NotificationSerializer,RetrieveSavedPostSerializer)
-from .models import Post,Comment,SavedPost,Notification
+from .models import Post,Comment,SavedPost,Notification,Reportedposts
 from authentication.models import User,Follow
+from authentication.serializers import UserSerializer
 import json
 
 # Create your views here.
@@ -222,8 +223,7 @@ class ReportPostView(APIView):
         except Post.DoesNotExist:
             return Response("Post does not exist",status=status.HTTP_404_NOT_FOUND)
         user = request.user
-        post.reported_by_users.add(user) 
-        post.save()
+        Reportedposts.objects.create(author=user,post=post)
         return Response("Post reported successfully",status=status.HTTP_200_OK)
 
 # this api is to fetch all the post if the count of 'reported_by_user' field is greater than 0, which simply means give

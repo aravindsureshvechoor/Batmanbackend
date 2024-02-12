@@ -17,10 +17,11 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
     is_deleted = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
-    reported_by_users = models.ManyToManyField(User, related_name='reported_posts', blank=True)
+    # reported_by_users = models.ManyToManyField(User, related_name='reported_posts', blank=True)
 
     def __str__(self):
-        return self.caption
+        if self.caption is not None:
+            return self.caption 
 
     def total_reports(self):
         return self.reported_by_users.count()
@@ -28,7 +29,9 @@ class Post(models.Model):
     def total_likes(self):
         return self.likes.count()
 
-    
+class Reportedposts(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    post   = models.ForeignKey(Post, on_delete=models.CASCADE) 
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name="comments", on_delete=models.CASCADE)

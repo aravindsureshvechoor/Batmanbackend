@@ -16,7 +16,6 @@ class AdminLogin(APIView):
 
 
         user = authenticate(request, email=email, password=password)
-        print('***********', user)
 
         if user is not None and user.is_staff:
             refresh = RefreshToken.for_user(user)
