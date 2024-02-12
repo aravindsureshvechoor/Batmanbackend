@@ -48,7 +48,7 @@ class ListPostOnUserSide(APIView):
         followed_authors = list(followed_authors)
         followed_authors.append(request.user.id)
         # Filter the queryset to get posts authored by followed users
-        queryset = Post.objects.filter(author__in=followed_authors).order_by('-created_at')
+        queryset = Post.objects.filter(author__in=followed_authors,is_blocked=False).order_by('-created_at')
         serializer = PostRetrieveSerializer(queryset, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
@@ -234,4 +234,25 @@ class FetchReportedPostsForAdmin(APIView):
         post             = Post.objects.annotate(num_of_reports=Count('reported_by_users')).filter(num_of_reports__gt=0)
         serialized_posts = self.serializer_class(post,many=True)
         return Response(serialized_posts.data,status=status.HTTP_200_OK)
-        
+
+
+# the two api's written below helps the admin to block and unblock a post
+class BlockAPost(APIView):
+    def post(self,request,pk):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response("Post doesnt exist",status=status.HTTP_404_NOT_FOUND)
+        post.is_blocked = True
+        post.save()
+        return Response("Blocked Successfully",status=status.HTTP_200_OK)
+
+class UnblockAPost(APIView):
+    def post(self,request,pk):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response("Post doesnt exist",status=status.HTTP_404_NOT_FOUND)
+        post.is_blocked = False
+        post.save()
+        return Response("Unblocked Successfully",status=status.HTTP_200_OK)

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (CreatePostView,ListPostOnUserSide,UserPostDeleteView,UserPostUpdateView,
 LikeView,CreateCommentView,DeleteCommentView,ListSinglePostOnUserSide,GetCommentsView,SavePostView,NotificationsView,
-NotificationsSeenView,RetrieveSavedPosts,ReportPostView,FetchReportedPostsForAdmin)
+NotificationsSeenView,RetrieveSavedPosts,ReportPostView,FetchReportedPostsForAdmin,BlockAPost,UnblockAPost)
 
 
 urlpatterns = [
@@ -20,4 +20,6 @@ urlpatterns = [
     path('notifications-seen/<int:pk>/', NotificationsSeenView.as_view(), name='notifications-seen'),
     path('reportpost/<int:pk>/', ReportPostView.as_view(), name='reportpost'),
     path('getreportedposts/', FetchReportedPostsForAdmin.as_view(), name='getreportedposts'),
+    path('postblock/<int:pk>/', BlockAPost.as_view(), name='postblock'),
+    path('postunblock/<int:pk>/', UnblockAPost.as_view(), name='postunblock'),
 ]
