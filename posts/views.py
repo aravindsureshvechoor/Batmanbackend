@@ -212,3 +212,26 @@ class NotificationsSeenView(generics.ListAPIView):
             return Response(status=status.HTTP_200_OK)
         except Post.DoesNotExist:
             return Response("Not found in database", status=status.HTTP_404_NOT_FOUND)
+
+# this api is to help user to report a post
+class ReportPostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self,request,pk):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response("Post does not exist",status=status.HTTP_404_NOT_FOUND)
+        user = request.user
+        post.reported_by_users.add(user) 
+        post.save()
+        return Response("Post reported successfully",status=status.HTTP_200_OK)
+
+# this api is to fetch all the post if the count of 'reported_by_user' field is greater than 0, which simply means give
+# all the reported posts to admin
+class FetchReportedPostsForAdmin(APIView):
+    serializer_class = PostRetrieveSerializer
+    def get(self,request):
+        post             = Post.objects.annotate(num_of_reports=Count('reported_by_users')).filter(num_of_reports__gt=0)
+        serialized_posts = self.serializer_class(post,many=True)
+        return Response(serialized_posts.data,status=status.HTTP_200_OK)
+        
