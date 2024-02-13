@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Post,Comment,SavedPost
 from authentication.models import User
-from . models import Notification
+from . models import Notification,Reportedposts
 from django.forms.models import model_to_dict
 from django.utils.timesince import timesince
 from authentication.serializers import UserSerializer
@@ -53,6 +53,7 @@ class PostRetrieveSerializer(serializers.ModelSerializer):
         return obj.author.email if obj.author else None
     # def get_author_profile_image(self,obj):
     #     return obj.author.profile_image if obj.author else None
+
 
 class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:

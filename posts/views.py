@@ -229,11 +229,12 @@ class ReportPostView(APIView):
 # this api is to fetch all the post if the count of 'reported_by_user' field is greater than 0, which simply means give
 # all the reported posts to admin
 class FetchReportedPostsForAdmin(APIView):
-    serializer_class = PostRetrieveSerializer
-    def get(self,request):
-        post             = Post.objects.annotate(num_of_reports=Count('reported_by_users')).filter(num_of_reports__gt=0)
-        serialized_posts = self.serializer_class(post,many=True)
-        return Response(serialized_posts.data,status=status.HTTP_200_OK)
+    def get(self, request):
+        distinct_posts_ids = Reportedposts.objects.values_list('post_id', flat=True).distinct()
+        unique_posts = Post.objects.filter(id__in=distinct_posts_ids)
+        serialized_posts = PostRetrieveSerializer(unique_posts, many=True)
+        
+        return Response(serialized_posts.data, status=status.HTTP_200_OK)
 
 
 # the two api's written below helps the admin to block and unblock a post
