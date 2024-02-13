@@ -13,13 +13,22 @@ class ChatRoomSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     sender_email = serializers.EmailField(source='sender.email', read_only=True)
     created = serializers.SerializerMethodField(read_only=True)
+    sender_first_name = serializers.SerializerMethodField(read_only=True)
+    sender_profile_image = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Message
-        fields = '__all__'
+        fields = ['room', 'sender_profile_image','sender', 'content', 'timestamp', 'is_seen', 'sender_email', 'created', 'sender_first_name']
+
     
     def get_created(self, obj):
         return timesince(obj.timestamp)
+
+    def get_sender_first_name(self, obj):
+        return obj.sender.first_name if obj.sender else None
+    
+    def get_sender_profile_image(self, obj):
+        return obj.sender.profile_image.url if obj.sender and obj.sender.profile_image else None
 
 
 class UserSerializer(serializers.ModelSerializer):

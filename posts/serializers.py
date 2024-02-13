@@ -41,18 +41,18 @@ class PostRetrieveSerializer(serializers.ModelSerializer):
     author_first_name = serializers.SerializerMethodField()
     author_last_name = serializers.SerializerMethodField()
     author_email = serializers.SerializerMethodField()
-    # author_profile_image = serializers.ImageField()
+    author_profile_image = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['id','is_blocked','author_email','caption','post_img','author_first_name','author_last_name','likes','created_at','total_likes']
+        fields = ['id','is_blocked','author_profile_image','author_email','caption','post_img','author_first_name','author_last_name','likes','created_at','total_likes']
     def get_author_first_name(self, obj):
         return obj.author.first_name if obj.author else None
     def get_author_last_name(self, obj):
         return obj.author.last_name if obj.author else None
     def get_author_email(self,obj):
         return obj.author.email if obj.author else None
-    # def get_author_profile_image(self,obj):
-    #     return obj.author.profile_image if obj.author else None
+    def get_author_profile_image(self,obj):
+        return obj.author.profile_image.url if obj.author else None
 
 
 class PostUpdateSerializer(serializers.ModelSerializer):
