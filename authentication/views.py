@@ -329,6 +329,6 @@ class UserSearchView(generics.ListAPIView):
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query) |
             Q(email__icontains=query)
-        )
+        ).exclude(is_staff=True)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)

@@ -7,11 +7,6 @@ from .managers import UserAccountManager
 def upload_to(instance, filename):
     return 'profile/{filename}'.format(filename=filename)
 
-# GENDER_CHOICES = [
-#     ('M', ('Male')),
-#     ('F', ('Female')),
-#     ('O', ('Other')),
-# ]
 
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50,null=True,blank=True)
