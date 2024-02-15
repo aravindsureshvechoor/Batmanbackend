@@ -12,9 +12,6 @@ class AdminLogin(APIView):
         email = request.data.get('email')
 
         password = request.data.get('password')
-        print('******email******', email)
-
-
         user = authenticate(request, email=email, password=password)
 
         if user is not None and user.is_staff:
