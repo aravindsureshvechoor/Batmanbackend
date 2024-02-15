@@ -59,6 +59,10 @@ class PostUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['caption']
+class CommentUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['body']
 
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -73,12 +77,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CommentretrieveSerializer(serializers.ModelSerializer):
     user_first_name = serializers.SerializerMethodField()
+    user_email = serializers.SerializerMethodField()
     
     class Meta:
         model = Comment
-        fields = ['id','body','created','user_first_name']
+        fields = ['id','body','user_email','created','user_first_name']
     def get_user_first_name(self, obj):
         return obj.user.first_name if obj.user else None
+    def get_user_email(self,obj):
+        return obj.user.email if obj.user else None
     
 class SavedPostSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)

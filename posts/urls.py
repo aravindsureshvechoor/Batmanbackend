@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (CreatePostView,ListPostOnUserSide,UserPostDeleteView,UserPostUpdateView,
-LikeView,CreateCommentView,DeleteCommentView,ListSinglePostOnUserSide,GetCommentsView,SavePostView,NotificationsView,
+LikeView,CreateCommentView,DeleteCommentView,EditCommentView,ListSinglePostOnUserSide,GetCommentsView,SavePostView,NotificationsView,
 NotificationsSeenView,RetrieveSavedPosts,ReportPostView,FetchReportedPostsForAdmin,BlockAPost,UnblockAPost)
 
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path('like/<int:pk>/', LikeView.as_view()),  
     path('comment/<int:pk>/', CreateCommentView.as_view(), name='comment-post'),
     path('deletecomment/<int:pk>/', DeleteCommentView.as_view(), name='delete-comment'),
+    path('editcomment/<int:pk>/', EditCommentView.as_view(), name='edit-comment'),
     path('retrievecomments/<int:pk>/', GetCommentsView.as_view(), name='retrieve-comment'),
     path('savepost/<int:pk>/', SavePostView.as_view(), name='save-post'),
     path('retrievesavedposts/', RetrieveSavedPosts.as_view(), name='notifications-seen'),

@@ -327,8 +327,7 @@ class UserSearchView(generics.ListAPIView):
         query = request.query_params.get('query', '').strip().lower()
         queryset = User.objects.filter(
             Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(email__icontains=query)
+            Q(last_name__icontains=query)
         ).exclude(is_staff=True)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)

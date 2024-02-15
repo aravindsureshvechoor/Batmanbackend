@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.db.models import Q, Count
 from django.db import transaction,IntegrityError
 from .serializers import (PostSerializer,PostUpdateSerializer,PostRetrieveSerializer,CommentSerializer,
-CommentretrieveSerializer,SavedPostSerializer,NotificationSerializer,RetrieveSavedPostSerializer)
+CommentretrieveSerializer,SavedPostSerializer,NotificationSerializer,RetrieveSavedPostSerializer,CommentUpdateSerializer)
 from .models import Post,Comment,SavedPost,Notification,Reportedposts
 from authentication.models import User,Follow
 from authentication.serializers import UserSerializer
@@ -147,6 +147,25 @@ class DeleteCommentView(APIView):
             return Response("Comment deleted successfully",status=status.HTTP_200_OK)
         except Comment.DoesNotExist:
             return Response("Not found in database", status=status.HTTP_404_NOT_FOUND)
+
+class EditCommentView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request, pk):
+        try:
+            comment = Comment.objects.get(id=pk)
+        except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = CommentUpdateSerializer(comment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+            
 
 
 class GetCommentsView(APIView):
