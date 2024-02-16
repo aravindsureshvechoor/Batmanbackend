@@ -78,14 +78,17 @@ class CommentSerializer(serializers.ModelSerializer):
 class CommentretrieveSerializer(serializers.ModelSerializer):
     user_first_name = serializers.SerializerMethodField()
     user_email = serializers.SerializerMethodField()
+    post_id    = serializers.SerializerMethodField()
     
     class Meta:
         model = Comment
-        fields = ['id','body','user_email','created','user_first_name']
+        fields = ['id','body','post_id','user_email','created','user_first_name']
     def get_user_first_name(self, obj):
         return obj.user.first_name if obj.user else None
     def get_user_email(self,obj):
         return obj.user.email if obj.user else None
+    def get_post_id(self,obj):
+        return obj.post.id if obj.post else None
     
 class SavedPostSerializer(serializers.ModelSerializer):
     post = PostSerializer(read_only=True)
