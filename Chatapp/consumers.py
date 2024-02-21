@@ -4,9 +4,10 @@ from asgiref.sync import sync_to_async
 from django.utils.timesince import timesince
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    User = get_user_model()
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f"chat_{self.room_id}"
