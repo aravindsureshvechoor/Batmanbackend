@@ -310,7 +310,7 @@ class UserProfileUpdate(APIView):
             user=User.objects.get(id=request.user.id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = UserUpdateSerializer(user,data=request.data)
+        serializer = UserUpdateSerializer(user,data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
