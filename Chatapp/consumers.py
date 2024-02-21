@@ -2,12 +2,14 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from django.utils.timesince import timesince
+
+from .serializers import UserSerializer
+from .models import Message, ChatRoom
 from django.contrib.auth import get_user_model
 
-
+User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    User = get_user_model()
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f"chat_{self.room_id}"
@@ -28,9 +30,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        from .serializers import UserSerializer  # Moved import inside the method
-        from .models import Message, ChatRoom  # Moved import inside the method
-
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         user = self.scope["user"]
@@ -68,7 +67,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def create_message(self, room_id, message, email):
-        from .models import Message, ChatRoom  # Moved import inside the method
         user = User.objects.get(email=email)
         room = ChatRoom.objects.get(id=room_id) 
         message = Message.objects.create(content=message, room=room, sender=user)
