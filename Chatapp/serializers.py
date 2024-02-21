@@ -1,16 +1,17 @@
 from rest_framework import serializers
 from django.utils.timesince import timesince
 
-from .models import ChatRoom, Message
-from authentication.models import User
-
 class ChatRoomSerializer(serializers.ModelSerializer):
+    from .models import ChatRoom  # Moved import inside the serializer
+
     class Meta:
         model = ChatRoom
         fields = '__all__'
 
-
 class MessageSerializer(serializers.ModelSerializer):
+    from .models import Message  # Moved import inside the serializer
+    from authentication.models import User  # Moved import inside the serializer
+
     sender_email = serializers.EmailField(source='sender.email', read_only=True)
     created = serializers.SerializerMethodField(read_only=True)
     sender_first_name = serializers.SerializerMethodField(read_only=True)
@@ -20,7 +21,6 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['room', 'sender_profile_image','sender', 'content', 'timestamp', 'is_seen', 'sender_email', 'created', 'sender_first_name']
 
-    
     def get_created(self, obj):
         return timesince(obj.timestamp)
 
@@ -30,14 +30,17 @@ class MessageSerializer(serializers.ModelSerializer):
     def get_sender_profile_image(self, obj):
         return obj.sender.profile_image.url if obj.sender and obj.sender.profile_image else None
 
-
 class UserSerializer(serializers.ModelSerializer):
+    from authentication.models import User  # Moved import inside the serializer
+
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'profile_image']
 
-
 class ChatRoomListSerializer(serializers.ModelSerializer):
+    from .models import ChatRoom, Message  # Moved import inside the serializer
+    from authentication.models import User  # Moved import inside the serializer
+
     unseen_message_count = serializers.SerializerMethodField()
     members = UserSerializer(many=True)
 
