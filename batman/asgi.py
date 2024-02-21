@@ -37,14 +37,15 @@ from posts.routing import websocket_urlpatterns as notification_url
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'batman.settings')
 
-def application(scope):
+def application(scope, receive, send):
     # Importing JwtAuthMiddleware here to defer the import until the application is called
     from .channelsmiddleware import JwtAuthMiddleware
-    return ProtocolTypeRouter(
-        {
-            'http': get_asgi_application(),
-            'websocket': JwtAuthMiddleware(
-                AllowedHostsOriginValidator(URLRouter(websocket_urlpatterns + notification_url))
+    
+    return ProtocolTypeRouter({
+        'http': get_asgi_application(),
+        'websocket': JwtAuthMiddleware(
+            AllowedHostsOriginValidator(
+                URLRouter(websocket_urlpatterns + notification_url)
             )
-        }
-    )
+        ),
+    })(scope, receive, send)
