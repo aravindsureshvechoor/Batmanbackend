@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'posts',   
 
 ]
+ASGI_APPLICATION = 'batman.asgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -84,7 +85,7 @@ TEMPLATES = [
 ]
 
 # WSGI_APPLICATION = 'batman.wsgi.application'
-ASGI_APPLICATION = 'batman.asgi.application'
+
 
 CHANNEL_LAYERS = {
     'default': {
