@@ -18,7 +18,7 @@ User = get_user_model()
 class UserSignupSerializer(serializers.ModelSerializer):
     class Meta:
         model  = User
-        fields = ['email', 'first_name', 'last_name','password','gender','otp']
+        fields = ['email','password']
 
     email = serializers.EmailField()
 
@@ -39,9 +39,9 @@ class UserSignupSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(
             email      = validated_data['email'],
-            first_name = validated_data['first_name'],
-            last_name  = validated_data['last_name'],
-            gender       = validated_data['gender'],
+            # first_name = validated_data['first_name'],
+            # last_name  = validated_data['last_name'],
+            # gender       = validated_data['gender'],
             password   = validated_data['password'],
         )
         return user
