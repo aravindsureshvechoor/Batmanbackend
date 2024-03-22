@@ -2,7 +2,6 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from django.utils.timesince import timesince
-
 from .serializers import UserSerializer
 from .models import Message, ChatRoom
 from django.contrib.auth import get_user_model
